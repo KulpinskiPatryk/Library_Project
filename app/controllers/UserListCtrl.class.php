@@ -5,22 +5,22 @@ namespace app\controllers;
 use core\App;
 use core\Utils;
 use core\ParamUtils;
-use app\forms\PersonSearchForm;
+use app\forms\UserSearchForm;
 
-class PersonListCtrl {
+class UserListCtrl {
 
     private $form; //dane formularza wyszukiwania
     private $records; //rekordy pobrane z bazy danych
 
     public function __construct() {
         //stworzenie potrzebnych obiektów
-        $this->form = new PersonSearchForm();
+        $this->form = new UserSearchForm();
     }
 
     public function validate() {
         // 1. sprawdzenie, czy parametry zostały przekazane
         // - nie trzeba sprawdzać
-        $this->form->surname = ParamUtils::getFromRequest('sf_surname');
+        $this->form->Login = ParamUtils::getFromRequest('Login');
 
         // 2. sprawdzenie poprawności przekazanych parametrów
         // - nie trzeba sprawdzać
@@ -28,7 +28,7 @@ class PersonListCtrl {
         return !App::getMessages()->isError();
     }
 
-    public function action_personList() {
+    public function action_UserList() {
         // 1. Walidacja danych formularza (z pobraniem)
         // - W tej aplikacji walidacja nie jest potrzebna, ponieważ nie wystąpią błedy podczas podawania nazwiska.
         //   Jednak pozostawiono ją, ponieważ gdyby uzytkownik wprowadzał np. datę, lub wartość numeryczną, to trzeba
@@ -37,8 +37,8 @@ class PersonListCtrl {
 
         // 2. Przygotowanie mapy z parametrami wyszukiwania (nazwa_kolumny => wartość)
         $search_params = []; //przygotowanie pustej struktury (aby była dostępna nawet gdy nie będzie zawierała wierszy)
-        if (isset($this->form->surname) && strlen($this->form->surname) > 0) {
-            $search_params['surname[~]'] = $this->form->surname . '%'; // dodanie symbolu % zastępuje dowolny ciąg znaków na końcu
+        if (isset($this->form->Login) && strlen($this->form->Login) > 0) {
+            $search_params['Login[~]'] = $this->form->Login . '%'; // dodanie symbolu % zastępuje dowolny ciąg znaków na końcu
         }
 
         // 3. Pobranie listy rekordów z bazy danych
@@ -52,15 +52,15 @@ class PersonListCtrl {
             $where = &$search_params;
         }
         //dodanie frazy sortującej po nazwisku
-        $where ["ORDER"] = "surname";
+        $where ["ORDER"] = "Login";
         //wykonanie zapytania
 
         try {
-            $this->records = App::getDB()->select("person", [
-                "idperson",
-                "name",
-                "surname",
-                "birthdate",
+            $this->records = App::getDB()->select("Users", [
+                "ID_User",
+                "Login",
+                "Password",
+                "ID_USER_TYPE",
                     ], $where);
         } catch (\PDOException $e) {
             Utils::addErrorMessage('Wystąpił błąd podczas pobierania rekordów');
@@ -70,8 +70,8 @@ class PersonListCtrl {
 
         // 4. wygeneruj widok
         App::getSmarty()->assign('searchForm', $this->form); // dane formularza (wyszukiwania w tym wypadku)
-        App::getSmarty()->assign('people', $this->records);  // lista rekordów z bazy danych
-        App::getSmarty()->display('PersonList.tpl');
+        App::getSmarty()->assign('Users', $this->records);  // lista rekordów z bazy danych
+        App::getSmarty()->display('UserList.tpl');
     }
 
 }

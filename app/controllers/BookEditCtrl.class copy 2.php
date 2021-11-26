@@ -6,7 +6,7 @@ use core\App;
 use core\Utils;
 use core\ParamUtils;
 use core\Validator;
-use app\forms\PersonEditForm;
+use app\forms\UserEditForm;
 
 class PersonEditCtrl {
 
@@ -14,7 +14,7 @@ class PersonEditCtrl {
 
     public function __construct() {
         //stworzenie potrzebnych obiektów
-        $this->form = new PersonEditForm();
+        $this->form = new UserEditForm();
     }
 
     // Walidacja danych przed zapisem (nowe dane lub edycja).
