@@ -37,12 +37,55 @@ class LoginCtrl {
         if (App::getMessages()->isError())
             return false;
 
+        $search_params1 = []; //przygotowanie pustej struktury (aby była dostępna nawet gdy nie będzie zawierała wierszy)
+        if (isset($this->form->login) && strlen($this->form->login) > 0) {
+            $search_params1['login[~]'] = $this->form->login . '%'; // dodanie symbolu % zastępuje dowolny ciąg znaków na końcu
+        }
+
+        $search_params2 = []; //przygotowanie pustej struktury (aby była dostępna nawet gdy nie będzie zawierała wierszy)
+        if (isset($this->form->pass) && strlen($this->form->pass) > 0) {
+            $search_params2['password[~]'] = $this->form->pass . '%'; // dodanie symbolu % zastępuje dowolny ciąg znaków na końcu
+        }
+
+        // 3. Pobranie listy rekordów z bazy danych
+        // W tym wypadku zawsze wyświetlamy listę osób bez względu na to, czy dane wprowadzone w formularzu wyszukiwania są poprawne.
+        // Dlatego pobranie nie jest uwarunkowane poprawnością walidacji (jak miało to miejsce w kalkulatorze)
+        //przygotowanie frazy where na wypadek większej liczby parametrów
+        $num_params = sizeof($search_params1);
+        if ($num_params > 1) {
+            $where = ["AND" => &$search_params1];
+            $where = ["AND" => &$search_params2];
+        } else {
+            $where = &$search_params1;
+        }
+        //dodanie frazy sortującej po nazwisku
+        $where ["ORDER"] = "id_user";
+        //wykonanie zapytania
+
+        try {
+            $this->records = App::getDB()->select("users", [
+                "id_user",
+                "login",
+                "password",
+                "user_type_id_type"
+                    ], $where);
+        } catch (\PDOException $e) {
+            Utils::addErrorMessage('Wystąpił błąd podczas pobierania rekordów');
+            if (App::getConf()->debug)
+                Utils::addErrorMessage($e->getMessage());
+        }
+        foreach($this->records as $wiersz){
+             $type[0] = $wiersz["id_user"];
+             $type[1] = $wiersz["login"];
+             $type[2] = $wiersz["password"];
+             $type[3] = $wiersz["user_type_id_type"];
+        }
         // sprawdzenie, czy dane logowania poprawne
         // (takie informacje najczęściej przechowuje się w bazie danych)
-        if ($this->form->login == "admin" && $this->form->pass == "admin") {
+        if ($this->form->login == "patryk" && $this->form->pass == "2137") {
             RoleUtils::addRole('admin');
-        } else if ($this->form->login == "user" && $this->form->pass == "user") {
-            RoleUtils::addRole('user');
+        } else if ($this->records != 0) {
+            RoleUtils::addRole($type[3]);
         } else {
             Utils::addErrorMessage('Niepoprawny login lub hasło');
         }
@@ -75,6 +118,7 @@ class LoginCtrl {
     public function generateView() {
         App::getSmarty()->assign('form', $this->form); // dane formularza do widoku
         App::getSmarty()->display('LoginView.tpl');
+        App::getSmarty()->assign('users', $this->records);  // lista rekordów z bazy danych
     }
 
 }

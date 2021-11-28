@@ -9,9 +9,9 @@ $conf->app_root = '/php_09_bd/public';   # project subfolder in domain (relative
 # ---- Database config - values required by Medoo
 $conf->db_type = 'mysql';
 $conf->db_server = 'localhost';
-$conf->db_name = 'simpledb';
-$conf->db_user = 'root';
-$conf->db_pass = '';
+$conf->db_name = 'Library';
+$conf->db_user = 'patryk';
+$conf->db_pass = '2137';
 $conf->db_charset = 'utf8';
 
 # ---- Database config - optional values
