@@ -14,6 +14,7 @@
 <div class="pure-menu pure-menu-horizontal bottom-margin">
 	<a href="{$conf->action_root}personList" class="pure-menu-heading pure-menu-link">Lista Użytkowników</a>
 	<a href="{$conf->action_root}bookList" class="pure-menu-heading pure-menu-link">Lista Książek</a>
+	<a href="{$conf->action_root}borrowList" class="pure-menu-heading pure-menu-link">Lista Książek Wypożyczonych</a>
 {if count($conf->roles)>0}
 	<a href="{$conf->action_root}logout" class="pure-menu-heading pure-menu-link">Wyloguj</a>
 {else}	
