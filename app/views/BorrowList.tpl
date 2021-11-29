@@ -26,7 +26,7 @@
 		<th>login</th>
 		<th>password</th>
 		<th>user_type</th>
-		<th>kurwa</th>
+		<th>kgafd</th>
 	</tr>
 </thead>
 <tbody>
